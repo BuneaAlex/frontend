@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Form, Button, Card, Alert } from "react-bootstrap";
+import { Row, Col, Form, Button, Card, Alert } from "react-bootstrap";
 import ReportDetailsModal from "./ReportDetailsModal";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { createReport, getGameModesDetails } from "./api/reportService";

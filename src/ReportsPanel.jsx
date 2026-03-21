@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Card, Button, Table, Modal, Alert, Row, Col, Form } from "react-bootstrap";
+import { useState } from "react";
+import { Card, Button, Table, Alert, Row, Col, Form } from "react-bootstrap";
 import ReportDetailsModal from "./ReportDetailsModal";
+import ChartsModal from "./ChartsModal";
 import {
   getAllReports,
   getReportsByDate,
@@ -14,11 +15,11 @@ export default function ReportsPanel() {
   const [reports, setReports] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
   const [error, setError] = useState("");
+  const [showCharts, setShowCharts] = useState(false);
 
   const loadAllReports = async () => {
     try {
       const res = await getAllReports();
-      console.log(res.data);
       setReports(res.data);
       setError("");
     } catch (err) {
@@ -89,6 +90,7 @@ export default function ReportsPanel() {
           <Col md={2} className="d-flex flex-column gap-2">
             <Button variant="primary" className="w-100" onClick={handleFilter}>Filter</Button>
             <Button variant="secondary" className="w-100" onClick={loadAllReports}>Get All</Button>
+            <Button variant="dark" className="w-100" onClick={() => setShowCharts(true)}>Show Charts</Button>
           </Col>
         </Row>
         {error && <Alert variant="danger">{error}</Alert>}
@@ -129,6 +131,7 @@ export default function ReportsPanel() {
         </Table>
         </div>
         <ReportDetailsModal show={!!selectedReport} onHide={() => setSelectedReport(null)} report={selectedReport} />
+        <ChartsModal show={showCharts} onClose={() => setShowCharts(false)} reports={reports} />
       </Card.Body>
     </Card>
   );
