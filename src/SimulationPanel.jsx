@@ -82,7 +82,8 @@ export default function SimulationPanel({ onSimulationRun }) {
       setCreatedReport(res.data);
       if (onSimulationRun) onSimulationRun();
     } catch (error) {
-      setError("Simulation failed.");
+      const backendResponse = error?.response?.data;
+      setError(`Simulation failed. ${backendResponse}`);
     }
   };
 
