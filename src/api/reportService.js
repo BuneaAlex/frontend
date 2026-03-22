@@ -23,3 +23,7 @@ export const getGameModesDetails = () => {
 export const getReportsByDateAndMode = (date, gameModeType) => {
   return axiosClient.get(`/reports/advanced-filter?date=${date}&gameModeType=${gameModeType}`);
 };
+
+export const deleteReport = (reportId) => {
+  return axiosClient.delete(`/reports?id=${reportId}`);
+}

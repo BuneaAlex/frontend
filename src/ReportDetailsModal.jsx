@@ -1,14 +1,45 @@
-import React from "react";
-import { Modal, Button, Row, Col, Table } from "react-bootstrap";
+import React, { useState } from "react";
+import { Modal, Button, Row, Col, Table, Alert } from "react-bootstrap";
+import { deleteReport } from "./api/reportService";
 
-export default function ReportDetailsModal({ show, onHide, report }) {
+export default function ReportDetailsModal({ show, onHide, report, onDelete }) {
+  const [deleteError, setDeleteError] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+
   if (!report) return null;
+
+  const handleDelete = () => {
+    setShowConfirmDelete(true);
+  };
+
+  const confirmDelete = async () => {
+    setShowConfirmDelete(false);
+    setIsDeleting(true);
+    setDeleteError("");
+    try {
+      await deleteReport(report.id);
+      if (onDelete) {
+        onDelete(report.id); // Notify parent component about the deletion
+      }
+      onHide(); // Close the modal after successful deletion
+    } catch (error) {
+      setDeleteError("Failed to delete report. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowConfirmDelete(false);
+  };
   return (
     <Modal show={show} onHide={onHide} size="lg" centered>
       <Modal.Header closeButton>
         <Modal.Title>Simulation Result</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        {deleteError && <Alert variant="danger">{deleteError}</Alert>}
         <h5 className="mb-3">Simulation Details</h5>
         <Row>
           <Col md={6}>
@@ -82,10 +113,31 @@ export default function ReportDetailsModal({ show, onHide, report }) {
         </Row>
       </Modal.Body>
       <Modal.Footer>
+        <Button variant="danger" onClick={handleDelete} disabled={isDeleting}>
+          {isDeleting ? "Deleting..." : "Delete Report"}
+        </Button>
         <Button variant="secondary" onClick={onHide}>
           Close
         </Button>
       </Modal.Footer>
+
+      {/* Confirmation Modal */}
+      <Modal show={showConfirmDelete} onHide={cancelDelete} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Are you sure you want to delete this report?</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={cancelDelete}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={confirmDelete}>
+            Delete Report
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Modal>
   );
 }

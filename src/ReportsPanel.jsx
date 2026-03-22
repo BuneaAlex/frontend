@@ -66,6 +66,22 @@ export default function ReportsPanel() {
     setCurrentPage(pageNumber);
   };
 
+  const handleReportDelete = (deletedReportId) => {
+    setReports(prevReports => {
+      const updatedReports = prevReports.filter(report => report.id !== deletedReportId);
+      
+      // Adjust current page if we're on a page that no longer exists
+      const newTotalPages = Math.ceil(updatedReports.length / pageSize);
+      if (currentPage > newTotalPages && newTotalPages > 0) {
+        setCurrentPage(newTotalPages);
+      } else if (updatedReports.length === 0) {
+        setCurrentPage(1);
+      }
+      
+      return updatedReports;
+    });
+  };
+
   return (
     <Card style={{ minWidth: 900, maxWidth: '100%' }} className="mx-auto">
       <Card.Body>
@@ -168,7 +184,7 @@ export default function ReportsPanel() {
             </Pagination>
           </div>
         )}
-        <ReportDetailsModal show={!!selectedReport} onHide={() => setSelectedReport(null)} report={selectedReport} />
+        <ReportDetailsModal show={!!selectedReport} onHide={() => setSelectedReport(null)} report={selectedReport} onDelete={handleReportDelete} />
         <ChartsModal show={showCharts} onClose={() => setShowCharts(false)} reports={reports} />
       </Card.Body>
     </Card>
