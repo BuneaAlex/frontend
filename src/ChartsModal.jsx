@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
 
 import {
@@ -48,6 +48,20 @@ export default function ChartsModal({ show, onClose, reports }) {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPageReports = reportOptions.slice(startIndex, endIndex);
+
+  useEffect(() => {
+  if (!show) {
+    const freshOptions = reports.map((report, index) => ({
+      id: `${report.skillWeight}/${report.waitTimeWeight}/${report.latencyWeight}/${report.matchmakingAlgorithmName}/${report.totalQueueRequests}/${index}`,
+    }));
+    setSelectedReports(freshOptions.length > 0 ? [freshOptions[0].id] : []);
+    setSelectionMessage("");
+    setCurrentPage(1);
+    setChartView("quality");
+    setSelectedMetrics(["matchQuality"]);
+    setSelectedDistribution("skill");
+  }
+  }, [show, reports]);
 
   const goToPage = (page) => {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)));
@@ -150,9 +164,9 @@ export default function ChartsModal({ show, onClose, reports }) {
     }
   };
 
-  const sortedReports = [...reports].sort(
-    (a, b) => a.skillWeight - b.skillWeight
-  );
+  const sortedReports = [...reports]
+  .sort((a, b) => a.skillWeight - b.skillWeight)
+  .slice(0, 18);
 
   const metricColors = [
     "rgba(75, 192, 192, 1)",
@@ -336,6 +350,11 @@ export default function ChartsModal({ show, onClose, reports }) {
                 />
               ))}
             </Form>
+            {reports.length > 18 && (
+              <Alert variant="warning" className="mb-3">
+                Too many reports to display. Showing the first 18 out of {reports.length}.
+              </Alert>
+            )}
             <Line data={chartData} options={chartOptions} />
           </>
         ) : (
@@ -361,7 +380,7 @@ export default function ChartsModal({ show, onClose, reports }) {
               </Alert>
             )}
             <div className="mb-3">
-              <Form>
+              <Form style={{ minHeight: 120 }}>
                 {currentPageReports.map(option => (
                   <Form.Check
                     key={option.id}
@@ -405,12 +424,6 @@ export default function ChartsModal({ show, onClose, reports }) {
         )}
 
       </Modal.Body>
-
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
-          Close
-        </Button>
-      </Modal.Footer>
 
     </Modal>
   );
