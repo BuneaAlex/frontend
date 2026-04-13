@@ -165,8 +165,10 @@ export default function SimulationPanel({ onSimulationRun }) {
               <div key={type}>
                 <div style={{ fontSize: 11, color: "#6c757d", marginBottom: 4 }}>{label}</div>
                 <input
-                  type="number" value={value}
-                  onChange={e => set(clamp(type, Number(e.target.value)))}
+                  type="number"
+                  value={value}
+                  onChange={e => set(Number(e.target.value))}
+                  onBlur={e => set(clamp(type, Number(e.target.value)))}
                   style={inputStyle}
                 />
               </div>
